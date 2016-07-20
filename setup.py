@@ -3,7 +3,7 @@ from setuptools import setup
 setup(
   name = 'loopfield',
   packages = ['loopfield'],
-  version = '1.0.2',
+  version = '1.0.4',
   description = 'Current loop magnetic field calculator',
   author = 'Ted Yapo',
   author_email = 'ted.yapo@zednaughtlabs.com',
