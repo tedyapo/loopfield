@@ -48,45 +48,42 @@ class Field(object):
     self.loops.append(loop)
     
   def evaluate(self, position):
-    _p = np.array(position)
-    B = np.array([0., 0., 0.])
+    _p = np.atleast_2d(position)
+    B = np.zeros(_p.shape)
     for loop in self.loops:
       B += self._evalLoop(_p, loop)
-    return B / self._field_units
+    return np.squeeze(B / self._field_units)
   
   def _evalLoop(self, p, loop):
     r_vect = (p - loop.p) * self._length_units
-    r = np.linalg.norm(r_vect)
-    z = loop.n.dot(r_vect)
-    rho_vect = r_vect - z * loop.n
-    rho = np.linalg.norm(rho_vect)
-    if rho > self._epsilon:
-      rho_vect = rho_vect / rho
-
+    r = np.linalg.norm(r_vect, axis=1, keepdims=True)
+    z = r_vect.dot(loop.n.T)
+    rho_vect = r_vect - np.outer(z, loop.n)
+    rho = np.linalg.norm(rho_vect, axis=1)
+    rho_vect[rho > self._epsilon,] = \
+      (rho_vect[rho > self._epsilon,].T/rho[rho > self._epsilon]).T
+    
     a = loop.r * self._length_units
     alpha2 = a*a + rho*rho + z*z - 2.*a*rho
     beta2 = a*a + rho*rho + z*z + 2.*a*rho
-    beta = math.sqrt(beta2)        
+    beta = np.sqrt(beta2)        
     c = 4.e-7 * loop.i  # \mu_0  I / \pi
     a2b2 = alpha2 / beta2
     Ek2 = scipy.special.ellipe(1. - a2b2)
     Kk2 = scipy.special.ellipkm1(a2b2)
     
     denom = (2. * alpha2 * beta * rho)
-    if math.fabs(denom) > self._epsilon:
-      Brho = c*z*(((a*a + rho*rho + z*z)*Ek2 - alpha2*Kk2) /
-                denom)
-    else:
-      Brho = 0.
+    with np.errstate(invalid='ignore'):
+      numer = c*z*((a*a + rho*rho + z*z)*Ek2 - alpha2*Kk2)
+    sw = np.abs(denom) > self._epsilon
+    Brho = np.zeros(numer.shape)
+    Brho[sw] = numer[sw] / denom[sw]
 
     denom = (2. * alpha2 * beta)
-    if math.fabs(denom) > self._epsilon:
-      Bz = c*(((a*a - rho*rho - z*z)*Ek2 + alpha2*Kk2) /
-              denom)
-    else:
-      Bz = np.inf
+    with np.errstate(invalid='ignore'):
+      numer = c*((a*a - rho*rho - z*z)*Ek2 + alpha2*Kk2)
+    sw = np.abs(denom) > self._epsilon
+    Bz = np.full(numer.shape, np.inf)
+    Bz[sw] = numer[sw] / denom[sw]
 
-    M = np.array([rho_vect, loop.n]).transpose()
-    B = np.array([Brho, Bz])
-    return M.dot(B)
-
+    return (Brho * rho_vect.T).T + np.outer(Bz, loop.n)

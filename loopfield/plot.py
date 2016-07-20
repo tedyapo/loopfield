@@ -3,6 +3,7 @@
 import math
 import numpy as np
 import matplotlib as mp
+mp.use('Agg')
 import matplotlib.pyplot as plt
 import matplotlib.patches as mpatches
 
@@ -21,15 +22,13 @@ class plotXY:
     self.n_y = n_y
     self.X = np.linspace(min_x, max_x, n_x)
     self.Y = np.linspace(min_y, max_y, n_y)
-    self.B = np.empty([n_y * n_x, 3])
+    points = np.empty([n_y * n_x, 3])
     for i in range(0, n_y):
       for j in range(0, n_x):
-        self.B[n_x * i + j, :] = self.field.evaluate(np.array([self.X[j],
-                                                               self.Y[i],
-                                                               0.]))
+        points[n_x * i + j, :] = np.array([self.X[j], self.Y[i], 0.])
+    self.B = self.field.evaluate(points)
 
     self.legend_handles = []
-    mp.use('Agg')
     plt.axis('equal')
     plt.grid(b = True, which = 'major')
     plt.grid(b = True, which = 'minor', color="0.75")
