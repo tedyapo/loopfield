@@ -1,6 +1,6 @@
 LoopField
 =========
-This is a pythom module for calculating 3D vector magentic fields induced by filamentary current loops (i.e. turns of wire). The code is based on the formulas presented in:
+This is a python module for calculating 3D vector magentic fields induced by filamentary current loops (i.e. turns of wire). The code is based on the formulas presented in:
 
 Simpson J., Lane J., Immer C., Youngquist R., Steinrock, T., Simple  
 Analytic Expressions for the Magnetic Field of a Circular Current  
