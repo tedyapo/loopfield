@@ -36,3 +36,7 @@ Usage
 See the examples directory for several simple tests.  For example, the helmholtz_coil.py example produces the following plot:
  
 ![helmholtz coil plot](/docs/images/helmholtz_coil.png)
+
+More Info
+=========
+More information about this code can be found in the logs for my [magnetic field scanner project](https://hackaday.io/project/11865-3d-magnetic-field-scanner).
