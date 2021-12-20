@@ -41,18 +41,30 @@ class plotXY:
       n_lines = math.floor(self.n_x / 2)
     if density is None:
       density = 10
-    start_points = (
+    start_pointsY = (
       np.array([np.zeros(n_lines),
                 self.min_y + (self.max_y - self.min_y) *
                 (0.5 + np.linspace(0, n_lines-1, n_lines)) /
                 (n_lines)]).transpose())
+    start_pointsX = (
+      np.array([self.min_x + (self.max_x - self.min_x) *
+                (0.5 + np.linspace(0, n_lines-1, n_lines)) /
+                (n_lines),
+                np.zeros(n_lines)]).transpose())
     strm = plt.streamplot(self.X, self.Y,
                           np.reshape(self.B[:, 0], [self.n_y, self.n_x]),
                           np.reshape(self.B[:, 1], [self.n_y, self.n_x]),
                           linewidth = 1, density = density,
                           color="0.5",
                           arrowsize = 1.,
-                          start_points = start_points)
+                          start_points = start_pointsX)
+    strm = plt.streamplot(self.X, self.Y,
+                          np.reshape(self.B[:, 0], [self.n_y, self.n_x]),
+                          np.reshape(self.B[:, 1], [self.n_y, self.n_x]),
+                          linewidth = 1, density = density,
+                          color="0.5",
+                          arrowsize = 1.,
+                          start_points = start_pointsY)
     
   def loopSymbols(self, scale = 1.):
     pos_X = []
